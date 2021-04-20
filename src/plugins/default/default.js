@@ -5,6 +5,6 @@ export default {
     },
     query (q, callback) {
         console.log(q)
-        callback(['Nothing Found'])
+        q === '' ? callback([]): callback(['Nothing Found'])
     }
 }

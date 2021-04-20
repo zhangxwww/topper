@@ -40,6 +40,7 @@ export default {
     },
     clear () {
       this.inputWord = ''
+      this.result.splice(0, this.result.length)
     },
     update (res) {
       res = res.slice(0, this.maxResultCount)
