@@ -1,22 +1,21 @@
 <template>
   <div>
-    <el-row>
+    <el-row class="margin-bottom">
       <el-input v-model="inputWord"
                 @keyup.enter="submit"
-                @keyup.esc="clear"></el-input>
+                @keyup.esc="clear"
+                class="no-drag"></el-input>
     </el-row>
-    <el-row type="flex"
-            justify="space-around">
-      <el-col :span="24">
-        <el-card v-for="res in result"
-                 :key="res"
-                 shadow="hover">
-          <div class="align-left">
-            {{ res }}
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-card class="padding-top">
+      <el-space direction="vertical"
+                alignment="start">
+        <div class="result-item"
+             v-for="res in result"
+             :key="res">
+          {{ res }}
+        </div>
+      </el-space>
+    </el-card>
   </div>
 </template>
 
@@ -25,8 +24,9 @@ export default {
   name: 'main-panel',
   data () {
     return {
+      maxResultCount: 10,
       inputWord: '',
-      result: ['result1', 'result2']
+      result: ['result1', 'result2', 'result1', 'result2', 'result1', 'result2', 'result1', 'result2', 'result1', 'result2']
     }
   },
   methods: {
@@ -41,10 +41,22 @@ export default {
 </script>
 
 <style>
-.el-card__body {
+.result-item {
+  text-align: left;
   padding: 5px 15px;
+  background: white;
 }
-.align-left {
+.margin-bottom {
+  margin-bottom: 5px;
+}
+.padding-top {
+  padding-top: 5px;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+.el-card__body {
+  padding: 0;
   text-align: left;
 }
 </style>

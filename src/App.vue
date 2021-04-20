@@ -20,6 +20,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 0px;
+  border-radius: 30px;
+}
+body {
+  background: #00000000;
+  margin: 0;
+  border-radius: 30px;
+  -webkit-app-region: drag;
 }
 </style>
