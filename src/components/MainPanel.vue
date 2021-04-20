@@ -29,17 +29,22 @@ export default {
     return {
       maxResultCount: 10,
       inputWord: '',
-      result: ['result1', 'result2', 'result1', 'result2', 'result1', 'result2', 'result1', 'result2', 'result1', 'result2']
+      result: []
     }
   },
   methods: {
     submit () {
-      const res = query(this.inputWord).slice(0, this.maxResultCount)
-      this.result.splice(0, this.result.length)
-      this.result.push(...res)
+      query(this.inputWord, res => {
+        this.update(res)
+      })
     },
     clear () {
       this.inputWord = ''
+    },
+    update (res) {
+      res = res.slice(0, this.maxResultCount)
+      this.result.splice(0, this.result.length)
+      this.result.push(...res)
     }
   }
 }

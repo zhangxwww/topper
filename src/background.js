@@ -1,8 +1,11 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, globalShortcut, Tray } from 'electron'
+import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+
+import query from './plugins/pluginManager.js'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
