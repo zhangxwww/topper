@@ -6,7 +6,8 @@
                 @keyup.esc="clear"
                 class="no-drag"></el-input>
     </el-row>
-    <el-card class="padding-top">
+    <el-card v-if="result.length > 0"
+             class="padding-top">
       <el-space direction="vertical"
                 alignment="start">
         <div class="result-item"
@@ -20,6 +21,8 @@
 </template>
 
 <script>
+import query from '../plugins/pluginManager'
+
 export default {
   name: 'main-panel',
   data () {
@@ -31,7 +34,9 @@ export default {
   },
   methods: {
     submit () {
-      console.log(this.inputWord)
+      const res = query(this.inputWord).slice(0, this.maxResultCount)
+      this.result.splice(0, this.result.length)
+      this.result.push(...res)
     },
     clear () {
       this.inputWord = ''
