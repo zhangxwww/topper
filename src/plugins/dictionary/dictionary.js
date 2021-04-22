@@ -22,8 +22,14 @@ function _query(q, callback) {
             curtime: curtime
         }
     }).then(res => {
-        console.log(res)
-        callback(res.data.basic.explains)
+        const result = []
+        if (res.data.isWord) {
+            result.push(`英：\\${res.data.basic['uk-phonetic']}\\     美：\\${res.data.basic['us-phonetic']}\\`)
+            result.push(...res.data.basic.explains)
+        } else {
+            result.push(...res.data.translation)
+        }
+        callback(result)
     }).catch(e => {
         console.log(e)
     })
@@ -43,7 +49,6 @@ export default {
         return q.search(pattern) === 0
     },
     query (q, callback) {
-        console.log(q)
         _query(q, callback)
     }
 }

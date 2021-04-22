@@ -30,7 +30,7 @@ export default {
   name: 'main-panel',
   data () {
     return {
-      maxResultCount: 10,
+      maxResultCount: 8,
       inputWord: '',
       result: []
     }
