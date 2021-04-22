@@ -8,6 +8,7 @@ export default function query (q, callback) {
   for (let p of plugins) {
     if (p.match(q)) {
       p.query(q, callback)
+      break
     }
   }
 }

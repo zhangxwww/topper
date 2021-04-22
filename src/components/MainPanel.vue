@@ -4,6 +4,8 @@
       <el-input v-model="inputWord"
                 @keyup.enter="submit"
                 @keyup.esc="clear"
+                @keyup.up.stop="historyBefore"
+                @keyup.down.stop="historyAfter"
                 class="no-drag"></el-input>
     </el-row>
     <el-card v-if="result.length > 0"
@@ -22,6 +24,7 @@
 
 <script>
 import query from '../plugins/pluginManager'
+import { historyUp, historyDown, historyAdd, historyReset } from '../history'
 
 export default {
   name: 'main-panel',
@@ -36,16 +39,28 @@ export default {
     submit () {
       query(this.inputWord, res => {
         this.update(res)
+        historyAdd(this.inputWord, res)
       })
     },
     clear () {
       this.inputWord = ''
       this.result.splice(0, this.result.length)
+      historyReset()
     },
     update (res) {
       res = res.slice(0, this.maxResultCount)
       this.result.splice(0, this.result.length)
       this.result.push(...res)
+    },
+    historyBefore () {
+      const { query, result } = historyUp()
+      this.inputWord = query
+      this.update(result)
+    },
+    historyAfter () {
+      const { query, result } = historyDown()
+      this.inputWord = query
+      this.update(result)
     }
   }
 }
