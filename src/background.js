@@ -1,8 +1,9 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, globalShortcut } from 'electron'
+import { app, protocol, BrowserWindow, globalShortcut, Tray, Menu, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import path from 'path'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -12,6 +13,8 @@ protocol.registerSchemesAsPrivileged([
 ])
 
 let win
+let tray
+
 async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
@@ -21,6 +24,7 @@ async function createWindow() {
     transparent: true,
     resizable: false,
     backgroundColor: '#00000000',
+    icon: path.join(__static, 't.ico'),
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -41,7 +45,28 @@ async function createWindow() {
     win.loadURL('app://./index.html')
   }
 
-  // win.setSkipTaskbar(true)
+  tray = new Tray(path.join(__static, 't.ico'))
+  const contextMenu = Menu.buildFromTemplate([
+      {label: '退出', click: () => win.destroy()}
+  ])
+
+  win.setSkipTaskbar(true)
+
+  tray.setContextMenu(contextMenu)
+  tray.setToolTip('Topper')
+  tray.on('click', () => {
+      win.isVisible() ? win.hide() : win.show()
+  })
+
+  win.on('closed', (event) => {
+      win = null;
+  })
+
+  win.on('close', (event) => {
+      win.hide()
+      win.setSkipTaskbar(true)
+      event.preventDefault()
+  })
 }
 
 // Quit when all windows are closed.
@@ -101,3 +126,7 @@ if (isDevelopment) {
     })
   }
 }
+
+ipcMain.on('hide', (e, args) => {
+  win.hide()
+})

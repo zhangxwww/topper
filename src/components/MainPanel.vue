@@ -26,6 +26,8 @@
 import query from '../plugins/pluginManager'
 import { historyUp, historyDown, historyAdd, historyReset } from '../history'
 
+import { ipcRenderer } from 'electron'
+
 export default {
   name: 'main-panel',
   data () {
@@ -43,9 +45,14 @@ export default {
       })
     },
     clear () {
-      this.inputWord = ''
-      this.result.splice(0, this.result.length)
-      historyReset()
+      if (this.inputWord === '') {
+        ipcRenderer.send('hide')
+        console.log('hide')
+      } else {
+        this.inputWord = ''
+        this.result.splice(0, this.result.length)
+        historyReset()
+      }
     },
     update (res) {
       res = res.slice(0, this.maxResultCount)
