@@ -58,6 +58,7 @@ export default {
       res = res.slice(0, this.maxResultCount)
       this.result.splice(0, this.result.length)
       this.result.push(...res)
+      console.log(this.result)
     },
     historyBefore () {
       const { query, result } = historyUp()

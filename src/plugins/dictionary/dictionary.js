@@ -24,7 +24,7 @@ function _query(q, callback) {
     }).then(res => {
         const result = []
         if (res.data.isWord) {
-            result.push(`英：\\${res.data.basic['uk-phonetic']}\\                            美：\\${res.data.basic['us-phonetic']}\\`)
+            result.push(`英:\\${res.data.basic['uk-phonetic']}\\ 美:\\${res.data.basic['us-phonetic']}\\`)
             result.push(...res.data.basic.explains)
         } else {
             result.push(...res.data.translation)
