@@ -26,4 +26,8 @@ function next() {
   return tokens.splice(0, 1)
 }
 
-export { parse, next }
+function lookAhead() {
+  return tokens[0]
+}
+
+export { parse, next, lookAhead }
