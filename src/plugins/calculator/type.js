@@ -14,9 +14,11 @@ const types = {
   LB: 12,
   RB: 13,
   EQ: 14,
-  RES: 15,
-  QES: 16,
-  SPACE: 17
+  ANS: 15,
+  SET: 16,
+  SPACE: 17,
+  GET: 18,
+  END: 19
 }
 
 
@@ -82,16 +84,20 @@ const typeRegs = [
     reg: /^=/
   },
   {
-    type: types.RES,
-    reg: /^res/
+    type: types.ANS,
+    reg: /^ans/
   },
   {
-    type: types.QES,
-    reg: /^\?/
+    type: types.SET,
+    reg: /^set/
   },
   {
     type: types.SPACE,
     reg: /^\s+/
+  },
+  {
+    type: types.GET,
+    reg: /^get/
   }
 ]
 

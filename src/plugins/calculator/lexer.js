@@ -37,7 +37,6 @@ function parse(input, errorHandler) {
       ({success, output, token} = tr.tryMatch(input))
       if (success) {
         input = output
-      console.log(output)
         match = true
         if (token.type !== types.SPACE) {
           tokens.push(token)
@@ -50,6 +49,7 @@ function parse(input, errorHandler) {
       return false
     }
   }
+  tokens.push({ type: types.END, value: '#' })
   return true
 }
 
