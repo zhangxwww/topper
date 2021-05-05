@@ -19,24 +19,6 @@ const types = {
   SPACE: 17
 }
 
-function tryMatchGenerator(type_, reg) {
-  const tm = (input) => {
-    const match = input.match(reg)
-    const success = match !== null
-    let output = null, token = null
-    if (success) {
-    const m = match[0]
-    output = input.slice(m.length)
-    if (type_ === type.NUMBER) {
-      token = { type: type_, value: parseFloat(m) }
-    } else {
-      token = { type: type_, value: m }
-    }
-    }
-    return { success: success, output: output, token: token }
-  }
-  return tm
-}
 
 const typeRegs = [
   {
@@ -45,7 +27,7 @@ const typeRegs = [
   },
   {
     type: types.NUMBER,
-    reg: /^[0-9]+(.[0-9]+)?/
+    reg: /^[0-9]+(\.[0-9]+)?/
   },
   {
     type: types.PLUS,
@@ -112,9 +94,5 @@ const typeRegs = [
     reg: /^\s+/
   }
 ]
-
-for (let tr of typeRegs) {
-  tr.tryMatch = tryMatchGenerator(tr.type, tr.reg)
-}
 
 export { types, typeRegs }
