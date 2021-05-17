@@ -1,4 +1,5 @@
 import lexer from './lexer.js'
+import parser from './parser.js'
 
 export default {
     match (q) {
@@ -6,15 +7,14 @@ export default {
         return q.search(pattern) >= 0
     },
     query (q, callback) {
-        console.log(q)
         lexer.parse(q, error => {
-            console.log('error', error)
+            console.log('Error Lexer', error)
         })
-        const res = []
-        while(lexer.hasNext()) {
-            res.push(lexer.next())
-        }
-        callback(res)
+        const res = parser.parse(lexer.lookAhead, lexer.next, lexer.hasNext, e => {
+            console.log('Error Parser: ', e)
+        })
+
+        callback([res])
         console.log(res)
     }
 }

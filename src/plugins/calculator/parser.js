@@ -1,23 +1,25 @@
 import { types } from './type.js'
 
-let lookAhead, next, errorHandler;
+let lookAhead, next, hasNext, errorHandler;
 
 let variables = { }
 let ans = 0
 
 let ahead
 
-function parse(lookAhead_, next_, errorHandler_) {
+function parse(lookAhead_, next_, hasNext_, errorHandler_) {
   lookAhead = lookAhead_
   next = next_
+  hasNext = hasNext_
   errorHandler = errorHandler_
-  variables = {}
   ahead = lookAhead()
   return parseStart()
 }
 
 function parseStart() {
   // START := ASSIGNMENT | QUERY | EXPRESSION
+  console.log('start')
+  console.log(variables)
   switch (ahead.type) {
     case types.SET:
       return parseAssignment()
@@ -30,7 +32,11 @@ function parseStart() {
     case types.E:
     case types.PI:
     case types.ANS:
-      return parseExpression()
+    case types.LG:
+    case types.LOG:
+    case types.LN:
+      ({value: ans} = parseExpression())
+      return ans
     default:
       errorHandler(ahead)
       return fail()
@@ -39,6 +45,7 @@ function parseStart() {
 
 function parseAssignment() {
   // ASSIGNMENT := set variable eq EXPRESSION
+  console.log('assignment')
   let success, value
 
   ({success} = matchToken(types.SET))
@@ -50,7 +57,7 @@ function parseAssignment() {
   if (!success) {
     return fail()
   }
-  const k = value
+  const k = value;
 
   ({success} = matchToken(types.EQ))
   if (!success) {
@@ -64,11 +71,14 @@ function parseAssignment() {
   const v = value
 
   variables[k] = v
+  console.log(variables)
   return suc(v)
 }
 
 function parseQuery() {
   // QUERY := get QQ
+  console.log('query')
+  console.log(variables)
   let success
   ({success} = matchToken(types.GET))
   if (!success) {
@@ -79,11 +89,13 @@ function parseQuery() {
 
 function parseQQ() {
   // QQ := variable | ans
-  let success, value
+  console.log('qq')
+  let value
+  let k
   switch (ahead.type) {
     case types.VARIABLE:
       ({value} = matchToken(types.VARIABLE))
-      const k = value
+      k = value
       return suc(variables[k] === undefined ? 'undefined' : variables[k])
     case types.ANS:
       matchToken(types.ANS)
@@ -96,12 +108,13 @@ function parseQQ() {
 
 function parseExpression() {
   // EXPRESSION := T EE
+  console.log('expression')
   let success, value
   ({success, value} = parseT())
   if (!success) {
     return fail()
   }
-  const v1 = value
+  const v1 = value;
 
   ({success, value} = parseEE())
   if (!success) {
@@ -113,53 +126,60 @@ function parseExpression() {
 
 function parseEE() {
   // EE := + T EE | - T EE | epsilon
+  console.log('ee', ahead.type, ahead.value)
   let success, value
+  let v1, v2, v3, v4
   switch (ahead.type) {
     case types.PLUS:
-      matchToken(type.PLUS)
+      matchToken(types.PLUS);
 
       ({success, value} = parseT())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v1 = value;
 
       ({success, value} = parseEE())
       if (!success) {
         return fail()
       }
-      const v2 = value
+      v2 = value
 
       return suc(v1 + v2)
     case types.MINUS:
-      matchToken(types.MINUS)
+      matchToken(types.MINUS);
 
       ({success, value} = parseT())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v3 = value;
 
       ({success, value} = parseEE())
       if (!success) {
         return fail()
       }
-      const v2 = value
+      v4 = value
 
-      return suc(-v1 + v2)
-    default:
+      return suc(-v3 + v4)
+
+    case types.RB:
+    case types.END:
       return suc(0)
+    default:
+      return fail()
   }
 }
 
 function parseT() {
   // T := F TT
+  console.log('t')
   let success, value
   ({success, value} = parseF())
   if (!success) {
     return fail()
   }
-  const v1 = value
+  const v1 = value;
 
   ({success, value} = parseTT())
   if (!success) {
@@ -171,48 +191,59 @@ function parseT() {
 
 function parseTT() {
   // TT := * F TT | / F TT | epsilon
+  console.log('tt', ahead.type, ahead.value)
   let success, value
+  let v1, v2, v3, v4
   switch (ahead.type) {
     case types.TIMES:
-      matchToken(type.TIMES)
+      matchToken(types.TIMES);
 
       ({success, value} = parseF())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v1 = value;
 
       ({success, value} = parseTT())
       if (!success) {
         return fail()
       }
-      const v2 = value
+      v2 = value
 
       return suc(v1 * v2)
     case types.DIVISION:
-      matchToken(types.DIVISION)
+      matchToken(types.DIVISION);
 
       ({success, value} = parseF())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v3 = value;
 
       ({success, value} = parseTT())
       if (!success) {
         return fail()
       }
-      const v2 = value
+      v4 = value
 
-      return suc(1 / v1 * v2)
-    default:
+      return suc(1 / v3 * v4)
+
+    case types.PLUS:
+    case types.MINUS:
+    case types.RB:
+    case types.END:
       return suc(1)
+    default:
+      return fail()
   }
 }
 
 function parseF() {
   // F := P FF | L
+  console.log('f')
+
   let success, value
+  let v1, v2
 
   switch (ahead.type) {
     case types.LB:
@@ -226,13 +257,13 @@ function parseF() {
       if (!success) {
         fail()
       }
-      const v1 = value
+      v1 = value;
 
       ({success, value} = parseFF())
       if (!success) {
         fail()
       }
-      const v2 = value
+      v2 = value
 
       return suc(Math.pow(v1, v2))
 
@@ -249,38 +280,40 @@ function parseF() {
 
 function parseL() {
   // L := log P | ln P | lg P
+  console.log('l')
   let success, value
+  let v1, v2, v3
 
   switch (ahead.type) {
     case types.LOG:
-      matchToken(types.LOG)
+      matchToken(types.LOG);
       ({success, value} = parseP())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v1 = value
 
       return suc(Math.log2(v1))
 
     case types.LN:
-      matchToken(types.LN)
+      matchToken(types.LN);
       ({success, value} = parseP())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v2 = value
 
-      return suc(Math.log(v1))
+      return suc(Math.log(v2))
 
     case types.LG:
-      matchToken(types.LG)
+      matchToken(types.LG);
       ({success, value} = parseP())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v3 = value
 
-      return suc(Math.log10(v1))
+      return suc(Math.log10(v3))
 
     default:
       errorHandler(ahead)
@@ -290,40 +323,52 @@ function parseL() {
 
 function parseFF() {
   // FF := ^ P FF | epsilon
+  console.log('ff')
   let success, value
+  let v1, v2
   switch (ahead.type) {
     case types.POWER:
-      matchToken(types.POWER)
+      matchToken(types.POWER);
       ({success, value} = parseP())
       if (!success) {
         return fail()
       }
-      const v1 = value
+      v1 = value;
 
       ({success, value} = parseFF())
       if (!success) {
         return fail()
       }
-      const v2 = value
+      v2 = value
 
       return suc(Math.pow(v1, v2))
-    default:
+
+    case types.PLUS:
+    case types.MINUS:
+    case types.TIMES:
+    case types.DIVISION:
+    case types.RB:
+    case types.END:
       return suc(1)
+    default:
+      return fail()
   }
 }
 
 function parseP() {
   // P := ( E ) | i
+  console.log('p')
   let success, value
+  let v
   switch (ahead.type) {
     case types.LB:
-      matchToken(types.LB)
+      matchToken(types.LB);
 
-      ({success, value} = parseE())
+      ({success, value} = parseExpression())
       if (!success) {
         return fail()
       }
-      const v = value
+      v = value;
 
       ({success} = matchToken(types.RB))
       if (!success) {
@@ -348,7 +393,9 @@ function parseP() {
 
 function parseI() {
   // I := J | - J
+  console.log('i')
   let success, value
+  let v
 
   switch (ahead.type) {
     case types.VARIABLE:
@@ -359,13 +406,13 @@ function parseI() {
       return parseJ()
 
     case types.MINUS:
-      matchToken(type.MINUS)
+      matchToken(types.MINUS);
 
       ({success, value} = parseJ())
       if (!success) {
         return fail()
       }
-      const v = value
+      v = value
       return suc(-v)
 
     default:
@@ -376,10 +423,16 @@ function parseI() {
 
 function parseJ() {
   // J := variable | number | e | pi | ans
+  console.log('j')
+  console.log(ahead)
+  let k, value
   switch (ahead.type) {
     case types.VARIABLE:
+      ({value} = matchToken(types.VARIABLE))
+      k = value
+      return variables[k] !== undefined ? suc(variables[k]) : fail()
     case types.NUMBER:
-      return matchToken(ahead.type)
+      return matchToken(types.NUMBER)
     case types.E:
       matchToken(types.E)
       return suc(Math.E)
@@ -396,12 +449,19 @@ function parseJ() {
 }
 
 function matchToken(expected) {
+  console.log('match ', expected)
   if (ahead.type !== expected) {
     errorHandler(ahead)
     return fail()
   } else {
-    ahead = next()
-    return suc(ahead.value)
+    if (!hasNext()) {
+      return fail()
+    }
+    const value = ahead.value
+    next()
+    ahead = lookAhead()
+    console.log('ahead: ', ahead.type, ahead.value)
+    return suc(value)
   }
 }
 
@@ -410,6 +470,7 @@ function fail() {
 }
 
 function suc(value) {
+  console.log(value)
   return { success: true, value: value }
 }
 

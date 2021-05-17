@@ -7,7 +7,6 @@ function tryMatchGenerator(type_, reg) {
     let output = null, token = null
     if (success) {
       const m = match[0]
-      console.log(match)
       output = input.slice(m.length)
       if (type_ === types.NUMBER) {
         token = { type: type_, value: parseFloat(m) }
@@ -25,14 +24,13 @@ for (let tr of typeRegs) {
 }
 
 
-const tokens = []
+let tokens = []
 
 function parse(input, errorHandler) {
-  tokens.splice(0, tokens.length)
+  tokens = []
   while (input.length > 0) {
     let match = false
     let success, output, token
-    console.log(input)
     for (let tr of typeRegs) {
       ({success, output, token} = tr.tryMatch(input))
       if (success) {
@@ -54,7 +52,7 @@ function parse(input, errorHandler) {
 }
 
 function next() {
-  return tokens.splice(0, 1)
+  return tokens.splice(0, 1)[0]
 }
 
 function lookAhead() {
