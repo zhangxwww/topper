@@ -13,7 +13,13 @@ function parse(lookAhead_, next_, hasNext_, errorHandler_) {
   hasNext = hasNext_
   errorHandler = errorHandler_
   ahead = lookAhead()
-  return parseStart()
+  const res = parseStart()
+  if (ahead.type === types.END) {
+    return res
+  } else {
+    unexpectedToken(ahead)
+    return 0
+  }
 }
 
 function parseStart() {
@@ -38,7 +44,7 @@ function parseStart() {
       ({value: ans} = parseExpression())
       return ans
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -101,7 +107,7 @@ function parseQQ() {
       matchToken(types.ANS)
       return suc(ans)
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -273,7 +279,7 @@ function parseF() {
       return parseL()
 
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -316,7 +322,7 @@ function parseL() {
       return suc(Math.log10(v3))
 
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -386,7 +392,7 @@ function parseP() {
       return parseI()
 
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -416,7 +422,7 @@ function parseI() {
       return suc(-v)
 
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -443,7 +449,7 @@ function parseJ() {
       matchToken(types.ANS)
       return suc(ans)
     default:
-      errorHandler(ahead)
+      unexpectedToken(ahead)
       return fail()
   }
 }
@@ -451,7 +457,7 @@ function parseJ() {
 function matchToken(expected) {
   console.log('match ', expected)
   if (ahead.type !== expected) {
-    errorHandler(ahead)
+    unexpectedToken(ahead)
     return fail()
   } else {
     if (!hasNext()) {
@@ -472,6 +478,11 @@ function fail() {
 function suc(value) {
   console.log(value)
   return { success: true, value: value }
+}
+
+function unexpectedToken(token) {
+  const msg = 'Unexpected token: ' + token.value
+  errorHandler(msg)
 }
 
 export default { parse }

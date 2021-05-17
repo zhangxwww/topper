@@ -7,14 +7,18 @@ export default {
         return q.search(pattern) >= 0
     },
     query (q, callback) {
+        let success = true, msg = ''
         lexer.parse(q, error => {
             console.log('Error Lexer', error)
+            success = false
+            msg = error
         })
-        const res = parser.parse(lexer.lookAhead, lexer.next, lexer.hasNext, e => {
-            console.log('Error Parser: ', e)
+        const res = parser.parse(lexer.lookAhead, lexer.next, lexer.hasNext, error => {
+            console.log('Error Parser: ', error)
+            success = false
+            msg = error
         })
 
-        callback([res])
-        console.log(res)
+        success ? callback([res]) : callback([msg])
     }
 }
